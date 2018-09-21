@@ -191,3 +191,16 @@ backgroundFetchTest(async (test, backgroundFetch) => {
   assert_equals(eventRegistration.failureReason, 'bad-status');
 
 }, 'Using Background Fetch to fetch a non-existent resource should fail.');
+
+backgroundFetchTest(async (test, backgroundFetch) => {
+  const registration = await backgroundFetch.fetch(
+                         'my-id',
+                         ['https://example.com', 'http://example.com']);
+
+  const {type, eventRegistration, results} = await getMessageFromServiceWorker();
+  assert_equals('backgroundfetchfail', type);
+  assert_equals(results.length, 1);
+  assert_true(results[0].url.includes('https://example.com'));
+  assert_equals(eventRegistration.failureReason, 'fetch-error');
+
+}, 'Fetches with mixed content should fail.');
